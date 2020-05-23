@@ -21,13 +21,20 @@ app.get('/', function (req, res) {
 })
 
 app.post('/info', upload.none(), async function (req, res, next) {
-    id = await processResponse(req.body.title);
-    info = await processResponse2(id);
-    //res.send(`<h1 style="font-size:35px;"><b>${info.Title}</b></h1><h2 style="font-size:20px;"><b>${info.Year}    Directed by ${info.Director}</b></h1><hr/><img src="${info.Poster}" width="200"><h3><small>${info.Plot}</small></h3><hr /><a href="./">Find another movie</a>`);
-    console.log("After", info.Title);
-    res.render('info',{locals:{allInfo:info.Title}});
+    info1 = await processResponse(req.body.title);
+    if (info1[0]=="False"){
+        res.send('<b><a href="./">Movie is not found. Find another movie.</a></b>');
+    }
+    else{
+        info2 = await processResponse2(info1[1]);
+        res.render('info',{locals:{allInfo:info2}});
+    }
     //res.render('index', {locals: {allInfo: info}});
     //res.send(info[0].Poster);
+  })
+
+  app.post('/library', upload.none(), async function (req, res, next) {
+    res.send(req.body);
   })
 
 //Find IMDB ID
@@ -49,7 +56,12 @@ function processResponse(response){
 
         req.end(function (res) {
             if (res.error) throw new Error(res.error);
-            info = res.body.Search[0].imdbID;
+            if (res.body.Response=="False"){
+                info = ["False"];
+            }
+            else {
+                info = ["True", res.body.Search[0].imdbID];
+            }
             //console.log(res.body.Search[0].Title);
             resolve(info);
         });
@@ -75,6 +87,7 @@ function processResponse2(response){
         req.end(function (res) {
             if (res.error) throw new Error(res.error);
             info = res.body;
+            console.log(info);
             resolve(info);
         });
     });

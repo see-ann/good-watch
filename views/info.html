@@ -1,7 +1,21 @@
 <!DOCTYPE html>
 <html>
    <body>
-      <h1>${allInfo}</h1>
+      <h1 style = "font-size: 35px;">${allInfo.Title}</h1>
+      <h2 style="font-size:20px;"><b>${allInfo.Year} Directed by ${allInfo.Director}&nbsp ${allInfo.imdbRating}/10 Stars</b></h2>
+      <hr/><img src="${allInfo.Poster}" width="200">
+      <form action = "http://127.0.0.1:8080/library" method = "POST"
+      enctype = "multipart/form-data">
+         <select name="watch" id="watch">
+            <option value="Currently Watching">Currently Watching</option>
+            <option value="Watched">Watched</option>
+            <option value="Want to Watch">Want to Watch</option>
+         </select>
+         <br><br>
+         <input type="submit" value="Submit">
+      </form>
+      <h3><small>${allInfo.Plot}</small></h3><hr />
+      <a href="./">Find another movie</a>
       
    </body>
 </html>
