@@ -1,12 +1,58 @@
 <!DOCTYPE html>
 <html>
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather" />
+    <style>
+        body {
+            font-family: Merriweather;
+            }
+
+            * {
+            box-sizing: border-box;
+            }
+
+        form.example input[type=text] {
+            padding: 5px;
+            font-size: 13px;
+            border: 1px solid grey;
+            float: left;
+            width: 25%;
+            background: #f1f1f1;
+            }
+        form.example button {
+            float: left;
+            width: 3%;
+            padding: 5px;
+            background: #2196F3;
+            color: white;
+            font-size: 13px;
+            border: 1px solid grey;
+            border-left: none;
+            cursor: pointer;
+          }
+          
+          form.example button:hover {
+            background: #0b7dda;
+          }
+          
+          form.example::after {
+            content: "";
+            clear: both;
+            display: table;
+          }
+    </style>
    <body>
-      <h1 style = "font-size: 35px;">${allInfo.Title}</h1>
-      <h2 style="font-size:20px;"><b>${allInfo.Year} Directed by ${allInfo.Director}&nbsp ${allInfo.imdbRating}/10 Stars</b></h2>
-      <hr/><img src="${allInfo.Poster}" width="200">
-      <form action = "http://127.0.0.1:8080/library" method = "POST"
+      <form class = "example" action = "http://127.0.0.1:8080/info" method = "POST"
       enctype = "multipart/form-data">
-         <select name="watch" id="watch">
+         <input type = "text" name = "title" size="25" placeholder="Search">  
+         <button type="submit"><i class="fa fa-search"></i></button>
+      </form>
+      <h1 style = "font-size: 27px;">${allInfo.Title}</h1>
+      <h2 style="font-size:17px;"><b>${allInfo.Year} Directed by ${allInfo.Director}&nbsp ${allInfo.imdbRating}/10 Stars</b></h2>
+      <hr/><img src="${allInfo.Poster}" width="200">
+      <form action = "http://127.0.0.1:8080/process_get" method = "GET"
+      enctype = "multipart/form-data">
+         <select name="watch" id="watch" style = "font-style: Merriweather;">
             <option value="Currently Watching">Currently Watching</option>
             <option value="Watched">Watched</option>
             <option value="Want to Watch">Want to Watch</option>
@@ -14,8 +60,8 @@
          <br><br>
          <input type="submit" value="Submit">
       </form>
-      <h3><small>${allInfo.Plot}</small></h3><hr />
-      <a href="./">Find another movie</a>
+      <h3 style = "font-size:14px">${allInfo.Plot}</h3><hr />
+      <a href="./">Library</a>
       
    </body>
 </html>

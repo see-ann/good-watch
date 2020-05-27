@@ -1,0 +1,189 @@
+<html>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet'>
+    <style>
+        body {
+            font-family: Merriweather;
+            }
+
+            * {
+            box-sizing: border-box;
+            }
+
+        form.example input[type=text] {
+            padding: 5px;
+            font-size: 13px;
+            border: 1px solid grey;
+            float: left;
+            width: 25%;
+            background: #f1f1f1;
+            }
+        form.example button {
+            float: left;
+            width: 3%;
+            padding: 5px;
+            background: #2196F3;
+            color: white;
+            font-size: 16px;
+            border: 1px solid grey;
+            border-left: none;
+            cursor: pointer;
+          }
+          
+          form.example button:hover {
+            background: #0b7dda;
+          }
+          
+          form.example::after {
+            content: "";
+            clear: both;
+            display: table;
+          }
+          .btn {
+            background-color: DodgerBlue;
+            border: none;
+            color: white;
+            padding: 8px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            }
+
+        /* Darker background on mouse-over */
+        .btn:hover {
+            background-color: RoyalBlue;
+            }
+    </style>
+    <body onload="GenerateTable()">
+        <form class = "example" action = "http://127.0.0.1:8080/info" method = "POST"
+        enctype = "multipart/form-data">
+           <input type = "text" name = "title" size="25" placeholder="Search">  
+           <button type="submit"><i class="fa fa-search"></i></button>
+        </form>
+        <hr>
+            <div id="dvTable" ></div>
+            <div id="empty"></div>
+    </body>
+</html>
+
+<script>
+    async function GenerateTable() {
+        dataString = '${allData}';
+        dataJSON = JSON.parse(dataString);
+        if (dataJSON.poster.length == 0){
+            console.log("HERE");
+            var span = document.createElement('span');
+            span.style.font = "14px arial, serif";
+            span.style.color = "grey";
+            text = document.createTextNode("Nothing in your library. Try searching for a movie or TV show.");
+            span.appendChild(text);
+            var empty = document.getElementById("empty");
+            empty.innerHTML = "";
+            empty.appendChild(span);
+        }
+        rowLength = dataJSON.poster.length+1;
+        data = new Array(rowLength);
+        // Loop to create 2D array using 1D array 
+        for (var i = 0; i < rowLength; i++) { 
+            data[i] = new Array(9);
+            }
+        data[0] = ["poster", "title", "director", "avg rating", "shelf", "date watched", "date added", " "]; 
+        // Loop to initilize 2D array elements. 
+        for (var i = 1; i < rowLength; i++) { 
+            for (var j = 0; j < 8; j++) {
+                if (j==0){
+                    data[i][j] = dataJSON.poster[i-1];
+                }
+                else if (j==1){
+                    data[i][j] = dataJSON.title[i-1];
+                }
+                else if (j==2){
+                    data[i][j] = dataJSON.director[i-1];
+                }
+                else if (j==3){
+                    data[i][j] = dataJSON.rating[i-1];
+                }
+                else if (j==4){
+                    data[i][j] = dataJSON.shelf[i-1];
+                }
+                else if (j==5){
+                    data[i][j] = dataJSON.dateWatched[i-1];
+                }
+                else if (j==6){
+                    data[i][j] = dataJSON.dateAdded[i-1];
+                }
+                else if (j==7){
+                    data[i][j] = dataJSON.id[i-1];
+                }
+                }
+            }
+        //Add back apostrophes
+        for (var i = 1; i < rowLength; i++) { 
+            data[i][1] = data[i][1].replace("&apos;", "'");
+        }
+        console.log("DATA", data);
+        //Create a HTML Table element.
+        var table = document.createElement("TABLE");
+        table.border = "0";
+        
+        //Get the count of columns.
+        var columnCount = data[0].length;
+        
+        //Add the header row.
+        var row = table.insertRow(-1);
+        for (var i = 0; i < columnCount; i++) {
+            var headerCell = document.createElement("TH");
+            headerCell.innerHTML = data[0][i];
+            headerCell.style.font = "italic bold 13px Lato";
+            row.appendChild(headerCell);
+        }
+
+        //Add the data rows.
+        for (var i = data.length-1; i > 0; i--) {
+            row = table.insertRow(-1);
+            for (var j = 0; j < columnCount; j++) {
+                var cell = row.insertCell(-1);
+                if (j==0){
+                    var img = document.createElement("IMG");
+                    var imgForm = document.createElement('FORM');
+                    var imgBtn = document.createElement('BUTTON');
+                    imgForm.method='POST';
+                    imgForm.action="http://127.0.0.1:8080/info";
+                    imgForm.enctype = "multipart/form-data";
+                    img.setAttribute("src", data[i][j]);
+                    img.setAttribute('width', 75);
+                    img.setAttribute('height', 111);
+                    imgBtn.name = 'title';
+                    imgBtn.value = data[i][1];
+                    imgBtn.appendChild(img);
+                    imgForm.appendChild(imgBtn);
+                    cell.appendChild(imgForm);
+                }
+                else if (j==7){
+                    form=document.createElement('FORM');
+                    form.method='GET';
+                    form.action="http://127.0.0.1:8080/delete";
+                    form.enctype = "multipart/form-data";
+                    btn = document.createElement("BUTTON");
+                    btn.innerHTML = "<i class='fa fa-trash'>";
+                    btn.className = "btn";
+                    //btn.type = "submit";
+                    btn.name = 'id';
+                    btn.value = data[i][7];
+                    form.appendChild(btn);
+                    cell.appendChild(form);
+                }
+                else{
+                    cell.innerHTML = data[i][j];
+                }
+                cell.style.font = "13px Lato";
+                cell.style.textAlign = "center";
+            }
+        }
+        
+ 
+        var dvTable = document.getElementById("dvTable");
+        dvTable.innerHTML = "";
+        dvTable.appendChild(table);
+    }
+</script>
