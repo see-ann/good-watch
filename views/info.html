@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather" />
+   <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather" />
+   <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet'>
     <style>
         body {
             font-family: Merriweather;
@@ -10,7 +11,6 @@
             * {
             box-sizing: border-box;
             }
-
         form.example input[type=text] {
             padding: 5px;
             font-size: 13px;
@@ -42,7 +42,7 @@
           }
     </style>
    <body>
-      <form class = "example" action = "http://127.0.0.1:8080/info" method = "POST"
+      <form class = "example" action = "http://127.0.0.1:8080/info" method = "GET"
       enctype = "multipart/form-data">
          <input type = "text" name = "title" size="25" placeholder="Search">  
          <button type="submit"><i class="fa fa-search"></i></button>
@@ -50,17 +50,19 @@
       <h1 style = "font-size: 27px;">${allInfo.Title}</h1>
       <h2 style="font-size:17px;"><b>${allInfo.Year} Directed by ${allInfo.Director}&nbsp ${allInfo.imdbRating}/10 Stars</b></h2>
       <hr/><img src="${allInfo.Poster}" width="200">
+
+
       <form action = "http://127.0.0.1:8080/process_get" method = "GET"
-      enctype = "multipart/form-data">
-         <select name="watch" id="watch" style = "font-style: Merriweather;">
-            <option value="Currently Watching">Currently Watching</option>
-            <option value="Watched">Watched</option>
-            <option value="Want to Watch">Want to Watch</option>
+      enctype = "multipart/form-data" class = "option">
+         <select name="watch" id="watch" style = "background-color: #409D69; font-family: Lato; color: white; font-size: 14px; border: 2px solid grey;">
+               <option value="Currently Watching">Currently Watching</option>
+               <option value="Watched">Watched</option>
+               <option value="Want to Watch">Want to Watch</option>
          </select>
-         <br><br>
-         <input type="submit" value="Submit">
+         <input type="submit" value="Submit" style = "background-color: #409D69; font-family: Lato; color: white; font-size: 13px; border: 2px solid grey;" >
+         <br>
       </form>
-      <h3 style = "font-size:14px">${allInfo.Plot}</h3><hr />
+      <p style = "font-size:14px">${allInfo.Plot}</p><hr />
       <a href="./">Library</a>
       
    </body>

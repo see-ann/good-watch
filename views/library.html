@@ -53,9 +53,35 @@
         .btn:hover {
             background-color: RoyalBlue;
             }
+        .inline {
+            display: inline;
+            }
+
+        .link-button {
+            background: none;
+            border: none;
+            color: #00635d;
+            cursor: pointer;
+            font-size: 1em;
+            font-family: Lato;
+            }
+        .link-button:focus {
+            outline: none;
+            }
+        .link-button:active {
+            color: royalblue;
+            }
+        .img-button{
+            background: none;
+            border: none;
+            cursor:pointer;
+        }
+        .img-button:focus {
+            outline: none;
+        }
     </style>
     <body onload="GenerateTable()">
-        <form class = "example" action = "http://127.0.0.1:8080/info" method = "POST"
+        <form class = "example" action = "http://127.0.0.1:8080/info" method = "GET"
         enctype = "multipart/form-data">
            <input type = "text" name = "title" size="25" placeholder="Search">  
            <button type="submit"><i class="fa fa-search"></i></button>
@@ -67,7 +93,7 @@
 </html>
 
 <script>
-    async function GenerateTable() {
+    function GenerateTable() {
         dataString = '${allData}';
         dataJSON = JSON.parse(dataString);
         if (dataJSON.poster.length == 0){
@@ -147,7 +173,7 @@
                     var img = document.createElement("IMG");
                     var imgForm = document.createElement('FORM');
                     var imgBtn = document.createElement('BUTTON');
-                    imgForm.method='POST';
+                    imgForm.method='GET';
                     imgForm.action="http://127.0.0.1:8080/info";
                     imgForm.enctype = "multipart/form-data";
                     img.setAttribute("src", data[i][j]);
@@ -155,9 +181,41 @@
                     img.setAttribute('height', 111);
                     imgBtn.name = 'title';
                     imgBtn.value = data[i][1];
+                    imgBtn.className = "img-button";
                     imgBtn.appendChild(img);
                     imgForm.appendChild(imgBtn);
                     cell.appendChild(imgForm);
+                }
+                else if (j==1){
+                    var btn = document.createElement('BUTTON');  
+                    var form = document.createElement('FORM');
+                    form.method = "GET";
+                    form.action = "http://127.0.0.1:8080/info";
+                    form.enctype = "multipart/form-data";
+                    btn.name = 'title';
+                    btn.value = data[i][1];
+                    btn.className = "link-button";
+                    btn.innerHTML = data[i][1];
+                    btn.style.font = "13px Lato";
+                    form.appendChild(btn);
+                    cell.appendChild(form);
+                
+                }
+                else if (j==4 || j==5){
+                    t = document.createTextNode(data[i][j]);
+                    linebreak = document.createElement('br');
+                    var btn = document.createElement('BUTTON');  
+                    btn.innerHTML = '[Edit]';
+                    btn.className = "link-button";
+                    btn.onclick = function(){
+                      date = document.createElement('input');
+                      date.type = 'date';
+                      cell.append(date);
+                      console.log("Here!");
+                    };
+                    cell.appendChild(t);
+                    cell.append(linebreak);
+                    cell.appendChild(btn);
                 }
                 else if (j==7){
                     form=document.createElement('FORM');
@@ -174,7 +232,10 @@
                     cell.appendChild(form);
                 }
                 else{
-                    cell.innerHTML = data[i][j];
+                    form=document.createElement('FORM');
+                    t = document.createTextNode(data[i][j]);
+                    form.appendChild(t);
+                    cell.appendChild(form);
                 }
                 cell.style.font = "13px Lato";
                 cell.style.textAlign = "center";

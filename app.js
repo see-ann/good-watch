@@ -21,8 +21,8 @@ app.get('/', async function (req, res) {
  })
  
 
-app.post('/info', upload.none(), async function (req, res, next) {
-    info1 = await processResponse(req.body.title);
+app.get('/info', upload.none(), async function (req, res, next) {
+    info1 = await processResponse(req.query.title);
     if (info1[0]=="False"){
         res.send('<b><a style = "font-family:Lato;" href="./">Movie is not found. Find another movie.</a></b>');
     }
@@ -67,7 +67,7 @@ function getDate(){
     var mm    = months[today.getMonth()];
     var yyyy  = today.getFullYear();
   
-    today = mm + " " + dd + "," + yyyy;
+    today = mm + " " + dd + ", " + yyyy;
     return today;
   }
   
@@ -96,7 +96,6 @@ function processResponse(response){
             else {
                 info = ["True", res.body.Search[0].imdbID];
             }
-            //console.log(res.body.Search[0].Title);
             resolve(info);
         });
     });
