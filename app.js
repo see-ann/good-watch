@@ -59,9 +59,24 @@ app.get('/info', upload.none(), async function (req, res, next) {
     res.render('library', {locals: {allData: finalString}});
 })
 
+app.get('/update', upload.none(), async function (req, res, next) {
+    date = req.query.date;
+    newDate = convertDate(date);
+    wait = await update(newDate, req.query.id);
+    data = await select();
+    var finalString = JSON.stringify(data).replace(/[\']/g, "&apos;");
+    res.render('library', {locals: {allData: finalString}});
+})
+
+app.get('/update2', upload.none(), async function (req, res, next) {
+    wait = await update2(req.query.watch, req.query.id);
+    data = await select();
+    var finalString = JSON.stringify(data).replace(/[\']/g, "&apos;");
+    res.render('library', {locals: {allData: finalString}});
+})
+
 function getDate(){
-    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-  
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     var today = new Date();
     var dd    = String(today.getDate()).padStart(2, '0');
     var mm    = months[today.getMonth()];
@@ -69,6 +84,18 @@ function getDate(){
   
     today = mm + " " + dd + ", " + yyyy;
     return today;
+  }
+
+  function convertDate(date){
+    var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    console.log(typeof(date));
+    dateArray = date.split('-');
+    var dd    = dateArray[2] ;
+    var month    = months[dateArray[1]-1];
+    var yyyy  = dateArray[0];
+  
+    newDate = month + " " + dd + ", " + yyyy;
+    return newDate;
   }
   
 //Find IMDB ID
@@ -187,6 +214,51 @@ function deleteFromDatabase(response){
           });
     });
 }
+
+function update(response1, response2){
+    return new Promise(function(resolve, reject) {
+        var mysql = require('mysql');
+        var con = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: "seanwang1327!",
+        database: "mydb"
+        });
+        con.connect(function(err) {
+            if (err) throw err;
+            console.log("Response1", typeof(response1) );
+            var sql = "UPDATE test3 SET dateWatched = '" + response1+  "' WHERE id = "+ response2;
+            con.query(sql, function (err, result) {
+              if (err) throw err;
+              console.log(result.affectedRows + " record(s) updated");
+              resolve('Done');
+            });
+        });
+    });
+}
+
+function update2(response1, response2){
+    return new Promise(function(resolve, reject) {
+        var mysql = require('mysql');
+        var con = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: "seanwang1327!",
+        database: "mydb"
+        });
+        con.connect(function(err) {
+            if (err) throw err;
+            console.log("Response1", response1);
+            var sql = "UPDATE test3 SET Shelf = '" + response1+  "' WHERE id = "+ response2;
+            con.query(sql, function (err, result) {
+              if (err) throw err;
+              console.log(result.affectedRows + " record(s) updated");
+              resolve('Done');
+            });
+        });
+    });
+}
+
 function select(){
     return new Promise(function(resolve, reject) {
         var mysql = require('mysql');

@@ -201,21 +201,98 @@
                     cell.appendChild(form);
                 
                 }
-                else if (j==4 || j==5){
+                else if (j==4){
                     t = document.createTextNode(data[i][j]);
                     linebreak = document.createElement('br');
-                    var btn = document.createElement('BUTTON');  
-                    btn.innerHTML = '[Edit]';
-                    btn.className = "link-button";
-                    btn.onclick = function(){
-                      date = document.createElement('input');
-                      date.type = 'date';
-                      cell.append(date);
-                      console.log("Here!");
+                    var editbtn = document.createElement('BUTTON');  
+                    editbtn.innerHTML = '[Edit]';
+                    editbtn.className = "link-button";
+                    btnIndicator = "false";
+                    editbtn.name = [data.length-i, j];
+                    editbtn.value = "false";
+                    editbtn.onclick = function (){
+                        if (this.value == 'true'){
+                            document.getElementById(this.name).remove();
+                            this.value = 'false';
+                        }
+                        else if (this.value == 'false'){
+                            form=document.createElement('FORM');
+                            form.method='GET';
+                            form.action="http://127.0.0.1:8080/update2";
+                            form.enctype = "multipart/form-data";
+                            form.id = this.name;
+                            form.class = 'option';
+                            select = document.createElement('select');
+                            select.name = "watch";
+                            select.style = "font-family: Lato;";
+                            option1 = document.createElement('option');
+                            option1.value = "Currently Watching";
+                            option1.innerHTML = 'Currently Watching';
+                            option2 = document.createElement('option');
+                            option2.value = "Watched";
+                            option2.innerHTML = 'Watched';
+                            option3 = document.createElement('option');
+                            option3.value = 'Want to Watch';
+                            option3.innerHTML = 'Want to Watch';
+                            select.options.add(option1);
+                            select.options.add(option2);
+                            select.options.add(option3);
+                            form.appendChild(select);
+                            savebtn = document.createElement('BUTTON');
+                            savebtn.innerHTML = "Save";
+                            savebtn.style = "background-color: 2196F3; color: white; font-family: Lato;";
+                            savebtn.name = 'id';
+                            savebtn.value = data[data.length-this.name[0]][7];
+                            form.appendChild(savebtn);
+                            table.rows[this.name[0]].cells[this.name[2]].append(form);
+                            this.value = 'true';
+                        }
+                        console.log("Here!", this.value);
                     };
                     cell.appendChild(t);
                     cell.append(linebreak);
-                    cell.appendChild(btn);
+                    cell.appendChild(editbtn);
+
+                }
+                else if (j==5){
+                    t = document.createTextNode(data[i][j]);
+                    linebreak = document.createElement('br');
+                    var editbtn = document.createElement('BUTTON');  
+                    editbtn.innerHTML = '[Edit]';
+                    editbtn.className = "link-button";
+                    btnIndicator = "false";
+                    editbtn.name = [data.length-i, j];
+                    editbtn.value = "false";
+                    editbtn.onclick = function (){
+                        if (this.value == 'true'){
+                            document.getElementById(this.name).remove();
+                            this.value = 'false';
+                        }
+                        else if (this.value == 'false'){
+                            date = document.createElement('input');
+                            date.type = 'date';
+                            date.name = 'date';
+                            date.style = 'font-family: Lato;';
+                            form=document.createElement('FORM');
+                            form.method='GET';
+                            form.action="http://127.0.0.1:8080/update";
+                            form.enctype = "multipart/form-data";
+                            form.id = this.name;
+                            savebtn = document.createElement('BUTTON');
+                            savebtn.innerHTML = "Save";
+                            savebtn.style = "background-color: 2196F3; color: white; font-family: Lato;";
+                            savebtn.name = 'id';
+                            savebtn.value = data[data.length-this.name[0]][7];
+                            form.appendChild(date);
+                            form.appendChild(savebtn);
+                            table.rows[this.name[0]].cells[this.name[2]].append(form);
+                            this.value = 'true';
+                        }
+                        console.log("Here!", this.value);
+                    };
+                    cell.appendChild(t);
+                    cell.append(linebreak);
+                    cell.appendChild(editbtn);
                 }
                 else if (j==7){
                     form=document.createElement('FORM');
@@ -232,10 +309,13 @@
                     cell.appendChild(form);
                 }
                 else{
+                    
                     form=document.createElement('FORM');
                     t = document.createTextNode(data[i][j]);
                     form.appendChild(t);
                     cell.appendChild(form);
+                    
+                    //cell.innerHTML = data[i][j];
                 }
                 cell.style.font = "13px Lato";
                 cell.style.textAlign = "center";
