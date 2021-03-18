@@ -9,6 +9,8 @@ var unirest = require("unirest");
 var multer  = require('multer');
 var upload = multer();
 
+app.use(express.static(path.join(__dirname, 'public')));
+
 
 // Create application/x-www-form-urlencoded parser
 //var urlencodedParser = bodyParser.urlencoded({ extended: false });
@@ -16,8 +18,13 @@ var upload = multer();
 
 app.get('/', async function (req, res) {
     data = await select();
+    console.log("DATA", data);
     var finalString = JSON.stringify(data).replace(/[\']/g, "&apos;");
     res.render('library', {locals: {allData: finalString}});
+ })
+
+ app.get('/test', function (req, res) {
+    res.sendFile( __dirname + "/public/" + "test.html" );
  })
  
 
@@ -35,7 +42,8 @@ app.get('/info', upload.none(), async function (req, res, next) {
   })
 
   app.get('/process_get', upload.none(), async function (req, res, next) {
-      response = [[info2.Poster, info2.Title, info2.Director, info2.imdbRating, req.query.watch, "Not set", getDate()]];  
+      console.log("Req",req.query.rating);
+      response = [[info2.Poster, info2.Title, info2.Director, (info2.imdbRating/2).toFixed(2), req.query.rating, req.query.watch, "Not set", getDate()]];  
       initialData = await select();
       match = await checkMatchingTitle(initialData, response[0][1]); 
       if (match == "false"){
@@ -52,7 +60,6 @@ app.get('/info', upload.none(), async function (req, res, next) {
   })
 
   app.get('/delete', upload.none(), async function (req, res, next) {
-    console.log(req.query.id);
     wait = await deleteFromDatabase(req.query.id);
     data = await select();
     var finalString = JSON.stringify(data).replace(/[\']/g, "&apos;");
@@ -74,6 +81,12 @@ app.get('/update2', upload.none(), async function (req, res, next) {
     var finalString = JSON.stringify(data).replace(/[\']/g, "&apos;");
     res.render('library', {locals: {allData: finalString}});
 })
+app.get('/update3', upload.none(), async function (req, res, next) {
+    wait = await update3(req.query.rating, req.query.id);
+    data = await select();
+    var finalString = JSON.stringify(data).replace(/[\']/g, "&apos;");
+    res.render('library', {locals: {allData: finalString}});
+})
 
 function getDate(){
     var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -88,7 +101,6 @@ function getDate(){
 
   function convertDate(date){
     var months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    console.log(typeof(date));
     dateArray = date.split('-');
     var dd    = dateArray[2] ;
     var month    = months[dateArray[1]-1];
@@ -147,7 +159,6 @@ function processResponse2(response){
         req.end(function (res) {
             if (res.error) throw new Error(res.error);
             info = res.body;
-            console.log(info);
             resolve(info);
         });
     });
@@ -169,7 +180,7 @@ function storeIntoDatabase(response){
             if (err) throw err;
             console.log("Connected!");
             //"if not exists (select Title from test3 d where d.Title =" + response[0][1] + ") INSERT INTO test3 (Image, Title, Director, Rating, Shelf, dateWatched, dateAdded) VALUES ?";
-            var sql = "INSERT INTO test3 (Image, Title, Director, Rating, Shelf, dateWatched, dateAdded) VALUES ?";
+            var sql = "INSERT INTO test3 (Image, Title, Director, Rating, myRating, Shelf, dateWatched, dateAdded) VALUES ?";
             var values = response;
             con.query(sql, [values], function (err, result) {
                 if (err) throw err;
@@ -226,7 +237,6 @@ function update(response1, response2){
         });
         con.connect(function(err) {
             if (err) throw err;
-            console.log("Response1", typeof(response1) );
             var sql = "UPDATE test3 SET dateWatched = '" + response1+  "' WHERE id = "+ response2;
             con.query(sql, function (err, result) {
               if (err) throw err;
@@ -259,6 +269,28 @@ function update2(response1, response2){
     });
 }
 
+function update3(response1, response2){
+    return new Promise(function(resolve, reject) {
+        var mysql = require('mysql');
+        var con = mysql.createConnection({
+        host: "localhost",
+        user: "root",
+        password: "seanwang1327!",
+        database: "mydb"
+        });
+        con.connect(function(err) {
+            if (err) throw err;
+            console.log("Response1", response1);
+            var sql = "UPDATE test3 SET myRating = '" + response1+  "' WHERE id = "+ response2;
+            con.query(sql, function (err, result) {
+              if (err) throw err;
+              console.log(result.affectedRows + " record(s) updated");
+              resolve('Done');
+            });
+        });
+    });
+}
+
 function select(){
     return new Promise(function(resolve, reject) {
         var mysql = require('mysql');
@@ -270,15 +302,15 @@ function select(){
         });
         con.connect(function(err) {
             if (err) throw err;
-            con.query("SELECT * FROM test3", function (err, result, fields) {
+            con.query("SELECT * FROM test3 ORDER BY Shelf DESC ", function (err, result, fields) {
               if (err) throw err;     
-              var data = new Array(8);
+              var data = new Array(9);
               // Loop to create 2D array using 1D array 
               for (var i = 0; i < data.length; i++) { 
                   data[i] = new Array(result.length);
                 } 
             // Loop to initilize 2D array elements. 
-            for (var i = 0; i < 8; i++) { 
+            for (var i = 0; i < 9; i++) { 
                 for (var j = 0; j < result.length; j++) {
                     if (i==0){
                         data[i][j] = result[j].Image; 
@@ -304,6 +336,9 @@ function select(){
                     else if (i==7){
                         data[i][j] = result[j].id;
                     }
+                    else if (i==8){
+                        data[i][j] = result[j].myRating;
+                    }
                     }
                 }
                 jsonData = {
@@ -314,7 +349,8 @@ function select(){
                     shelf: data[4],
                     dateWatched: data[5],
                     dateAdded: data[6],
-                    id: data[7]
+                    id: data[7],
+                    myRating: data[8]
                 }
             resolve(jsonData);
             });

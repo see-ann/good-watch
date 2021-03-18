@@ -1,46 +1,116 @@
+
 <!DOCTYPE html>
 <html>
+   <base href="/">
    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Merriweather" />
    <link href='https://fonts.googleapis.com/css?family=Lato' rel='stylesheet'>
+   
     <style>
-        body {
-            font-family: Merriweather;
-            }
+       .stars-outer {
+      display: inline-block;
+      position: relative;
+      font-family: FontAwesome;
+      }
+      
+      .stars-outer::before {
+      content: "☆☆☆☆☆ ${(allInfo.imdbRating/2).toFixed(2)}";
+      font-size: 15px;
+      font-family: Merriweather;
 
-            * {
-            box-sizing: border-box;
-            }
-        form.example input[type=text] {
-            padding: 5px;
-            font-size: 13px;
-            border: 1px solid grey;
-            float: left;
-            width: 25%;
-            background: #f1f1f1;
-            }
-        form.example button {
-            float: left;
-            width: 3%;
-            padding: 5px;
-            background: #2196F3;
-            color: white;
-            font-size: 13px;
-            border: 1px solid grey;
-            border-left: none;
-            cursor: pointer;
-          }
+      }
+      
+      .stars-inner {
+      position: absolute;
+      top: 0;
+      left: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      width: 0px;
+      }
+      
+      .stars-inner::before {
+      content: "★★★★★";
+      font-size: 15px;
+      color:#FF9900;
+      }
+      body {
+         font-family: Merriweather;
+         
+         }
+
+         * {
+         box-sizing: border-box;
+         }
+      form.example input[type=text] {
+         padding: 5px;
+         font-size: 13px;
+         border: 1px solid grey;
+         float: left;
+         width: 25%;
+         background: #f1f1f1;
+         }
+      form.example button {
+         float: left;
+         width: 3%;
+         padding: 5px;
+         background: #2196F3;
+         color: white;
+         font-size: 13px;
+         border: 1px solid grey;
+         border-left: none;
+         cursor: pointer;
+         }
+         
+         form.example button:hover {
+         background: #0b7dda;
+         }
+         
+         form.example::after {
+         content: "";
+         clear: both;
+         display: table;
+         }
+
+         form.rating {
+        float:left;
+        width:120px;
+      }
+      form.rating span { float:right; position:left; }
+      form.rating span input {
+         position:absolute;
+         top:0px;
+         left:0px;
+         opacity:0;
+      }
+      form.rating span label {
+         display:inline-block;
+         width:20px;
+         height:20px;
+         background: url('star1.png');
+         background-size: 20px 20px;
+         margin-right:0px;
+         line-height:30px;
+         border-radius:50%;
+         -webkit-border-radius:50%;
+      }
+      form.rating span:hover ~ span label,
+      form.rating span:hover label,
+      form.rating span.checked label,
+      .rating span.checked ~ span label {
+         background: url('star2.png');
+         background-size: 20px 20px;
+         color:#FFF;
+      }
+      div.a {
+  text-indent: 38px;
+}
+
+
           
-          form.example button:hover {
-            background: #0b7dda;
-          }
-          
-          form.example::after {
-            content: "";
-            clear: both;
-            display: table;
-          }
     </style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
    <body>
       <form class = "example" action = "http://127.0.0.1:8080/info" method = "GET"
       enctype = "multipart/form-data">
@@ -48,7 +118,11 @@
          <button type="submit"><i class="fa fa-search"></i></button>
       </form>
       <h1 style = "font-size: 27px;">${allInfo.Title}</h1>
-      <h2 style="font-size:17px;"><b>${allInfo.Year} Directed by ${allInfo.Director}&nbsp ${allInfo.imdbRating}/10 Stars</b></h2>
+      <h2 style="font-size:17px;"><b>${allInfo.Year} Directed by ${allInfo.Director}</b></h2>
+      <div class="stars-outer">
+         <div id = 'star' class="stars-inner"></div>
+       </div>
+      
       <hr/><img src="${allInfo.Poster}" width="200">
 
 
@@ -59,11 +133,59 @@
                <option value="Watched">Watched</option>
                <option value="Want to Watch">Want to Watch</option>
          </select>
+         <input name="rating" id = "rating" type="hidden" />
          <input type="submit" value="Submit" style = "background-color: #409D69; font-family: Lato; color: white; font-size: 13px; border: 1px solid grey;" >
          <br>
       </form>
+      <div class="a">
+         <h style = "font-size:11px; color:grey;">Your Rating</h>
+      </div>
+      <div style="line-height:5%;">
+         <br>
+     </div>
+      <form class="rating">
+         
+         <span><input type="radio" name="rating" id="str5" value="5"><label for="str5"></label></span>
+         <span><input type="radio" name="rating" id="str4" value="4"><label for="str4"></label></span>
+         <span><input type="radio" name="rating" id="str3" value="3"><label for="str3"></label></span>
+         <span><input type="radio" name="rating" id="str2" value="2"><label for="str2"></label></span>
+         <span><input type="radio" name="rating" id="str1" value="1"><label for="str1"></label></span>
+     </form>
+     <div style="line-height:80%;">
+      <br>
+  </div>
       <p style = "font-size:14px">${allInfo.Plot}</p><hr />
-      <a href="./">Library</a>
-      
-   </body>
+      <a href="./" >Library</a>
 </html>
+    
+    
+
+
+<script>
+$(document).ready(function getStarValue(){
+//  Check Radio-box
+    $(".rating input:radio").attr("checked", false);
+    $('.rating input').click(function () {
+        $(".rating span").removeClass('checked');
+        $(this).parent().addClass('checked');
+    });
+    $('input:radio').change(
+      function(){
+        var userRating = this.value;
+        x = document.getElementById('rating');
+        x.value = userRating;
+    }); 
+});
+</script>
+
+<script>
+ const starTotal = 5;
+ rating = '${allInfo.imdbRating/2}';
+  // 2
+  const starPercentage = (rating / starTotal) * 100;
+  // 3
+  const starPercentageRounded = (starPercentage / 10 * 7.5);
+  console.log(starPercentageRounded);
+ document.getElementById('star').style.width = starPercentageRounded+'px';
+
+</script>
